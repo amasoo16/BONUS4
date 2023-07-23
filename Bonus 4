@@ -1,0 +1,117 @@
+using System;
+
+public class BankAccount //Abdullah Masood ~ 301342047 ~ Bonus4 
+{
+    private double balance;
+
+    public int AccountNumber { get; }
+    public string CustomerName { get; }
+    public double Balance => balance;
+
+    public BankAccount(int accountNumber, string customerName, double balance)
+    {
+        AccountNumber = accountNumber;
+        CustomerName = customerName;
+        this.balance = balance;
+    }
+
+    public void Withdraw(double amount)
+    {
+        if (amount <= 0)
+            throw new ArgumentOutOfRangeException("Amount cannot be 0 nor negative");
+
+        if (amount > balance)
+            throw new ArgumentOutOfRangeException("Amount cannot be greater than the Balance");
+
+        balance -= amount;
+    }
+
+    public void Deposit(double amount)
+    {
+        if (amount <= 0)
+            throw new ArgumentOutOfRangeException("Amount cannot be 0 nor negative");
+
+        balance += amount;
+    }
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        BankAccount bankAccount = new BankAccount(123456, "John Doe", 1000.00);
+
+        Console.Write("Enter the amount to deposit: ");
+        double depositAmount = double.Parse(Console.ReadLine());
+        bankAccount.Deposit(depositAmount);
+        Console.WriteLine($"New balance: {bankAccount.Balance:C}");
+
+        Console.Write("Enter the amount to withdraw: ");
+        double withdrawAmount = double.Parse(Console.ReadLine());
+        bankAccount.Withdraw(withdrawAmount);
+        Console.WriteLine($"New balance: {bankAccount.Balance:C}");
+
+        // Run tests
+        BankAppTests();
+    }
+
+    public static void BankAppTests()
+    {
+        // Test Deposit method
+        BankAccount bankAccount = new BankAccount(123456, "Test Customer", 1000.00);
+        double depositAmount = 500.00;
+        bankAccount.Deposit(depositAmount);
+        Assert(bankAccount.Balance == 1500.00, "Deposit_ValidAmount_UpdatesBalance");
+
+        // Test Withdraw method
+        double withdrawAmount = 300.00;
+        bankAccount.Withdraw(withdrawAmount);
+        Assert(bankAccount.Balance == 1200.00, "Withdraw_ValidAmount_UpdatesBalance");
+
+        // Test Withdraw more than balance
+        withdrawAmount = 1500.00;
+        bool exceptionThrown = false;
+        try
+        {
+            bankAccount.Withdraw(withdrawAmount);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            exceptionThrown = true;
+        }
+        Assert(exceptionThrown, "Withdraw_MoreThanBalance_ThrowsException");
+
+        // Test Withdraw zero or negative amount
+        withdrawAmount = -100.00;
+        exceptionThrown = false;
+        try
+        {
+            bankAccount.Withdraw(withdrawAmount);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            exceptionThrown = true;
+        }
+        Assert(exceptionThrown, "Withdraw_ZeroOrNegativeAmount_ThrowsException");
+
+        // Test Deposit zero or negative amount
+        depositAmount = -200.00;
+        exceptionThrown = false;
+        try
+        {
+            bankAccount.Deposit(depositAmount);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            exceptionThrown = true;
+        }
+        Assert(exceptionThrown, "Deposit_ZeroOrNegativeAmount_ThrowsException");
+    }
+
+    public static void Assert(bool condition, string testName)
+    {
+        string result = condition ? "Passed" : "Failed";
+        Console.WriteLine($"Test {testName}: {result}");
+    }
+}
+
